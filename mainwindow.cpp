@@ -23,13 +23,31 @@ MainWindow::MainWindow()
     plot_2_scene    = new QGraphicsScene();
 
     main_button     = new QPushButton("&start");
+    reset_button    = new QPushButton("&reset");
 
     length_input_label  = new QLabel("Enter lenght (1-10)m");
-    length_input    = new QLineEdit();
+    length_input        = new QLineEdit();
     lenght_input_value  = new QLabel();
     mass_input_label    = new QLabel("Enter mass (0.1 - 10)kg");
-    mass_input      = new QLineEdit();
+    mass_input          = new QLineEdit();
     mass_input_value    = new QLabel("heh");
+    g_input_label       = new QLabel("Enter g N/s");
+    g_input             = new QLineEdit();
+    g_input_value       = new QLabel("heh");
+    attenuation_input_label     = new QLabel("Enter attenuation");
+    attenuation_input           = new QLineEdit();
+    attenuation_input_value     = new QLabel();
+
+
+    math_animation              = new QCheckBox("Math animation");
+    math_animation_attenuation  = new QCheckBox("Math Attenuation");
+    math_animation_label        = new QLabel();
+    math_animation_attenuation->setEnabled(false);
+    real_animation              = new QCheckBox("Real animation");
+    real_animation_attenuation  = new QCheckBox("Real Attenuation");
+    real_animation_attenuation->setEnabled(false);
+    real_animation_label        = new QLabel();
+
 
     timer           = new QTimer();
 
@@ -82,9 +100,26 @@ MainWindow::MainWindow()
     settings_layout->addWidget(mass_input,          1, 1);
     settings_layout->addWidget(mass_input_value,    1, 2);
     mass_input_value->setMinimumWidth(50);
+    settings_layout->addWidget(g_input_label,       2, 0);
+    settings_layout->addWidget(g_input,             2, 1);
+    settings_layout->addWidget(g_input_value,       2, 2);
+    g_input_value->setMinimumWidth(50);
+    settings_layout->addWidget(math_animation,              3, 0);
+    //settings_layout->addWidget(math_animation_attenuation,  3, 1);
+    settings_layout->addWidget(math_animation_label,        3, 1);
+    //math_animation_label->setMinimumWidth(120);
+    settings_layout->addWidget(real_animation,              4, 0);
+    //settings_layout->addWidget(real_animation_attenuation,  4, 1);
+    settings_layout->addWidget(real_animation_label,        4, 1);
+    //real_animation_label->setMinimumWidth(120);
 
-    settings_layout->addWidget(main_button,         2, 0, Qt::AlignBottom);
-    settings_layout->addWidget(current_system,      3, 0);
+    settings_layout->addWidget(attenuation_input_label,     5, 0);
+    settings_layout->addWidget(attenuation_input,           5, 1);
+    settings_layout->addWidget(attenuation_input_value,     5, 2);
+
+    settings_layout->addWidget(main_button,         6, 0, Qt::AlignBottom);
+    settings_layout->addWidget(reset_button,        6, 1, Qt::AlignBottom);
+    settings_layout->addWidget(current_system,      7, 0);
 
     settings_window->setLayout(settings_layout);
     settings_window->resize(settings_window_width, settings_window_height);
@@ -92,8 +127,13 @@ MainWindow::MainWindow()
     // Setting connections
 
     connect(timer,          SIGNAL(timeout()),                  this, SLOT(NextFrame()));
+
     connect(main_button,    SIGNAL(released()),                 this, SLOT(ChangeAnimationStatus()));
+    connect(reset_button,   SIGNAL(released()),                 this, SLOT(Reset()));
     connect(current_system, SIGNAL(currentIndexChanged(int)),   this, SLOT(ChangeCurrentAnimation(int)));
+
+    //connect(math_animation, SIGNAL(clicked(bool)), math_animation_attenuation, SLOT(setEnabled(bool)));
+    //connect(real_animation, SIGNAL(clicked(bool)), real_animation_attenuation, SLOT(setEnabled(bool)));
 
     timer->start(frame_frequency);
 
@@ -208,10 +248,19 @@ void MainWindow::NextFrame()
 */
 
     L = length_input->text().toDouble();
-    if(L > 1000)        L = 10;
-    if(L < 0)           L = 1;
-
+    if(L > 2 || L <= 0)         L = 1;
     lenght_input_value->setText(QString::number(L));
+
+    m = mass_input->text().toDouble();
+    if(m <= 0)                  m = 1;
+    mass_input_value->setText(QString::number(m));
+
+    g = g_input->text().toDouble();
+    if(g <= 0)                  g = 9.8;
+    g_input_value->setText(QString::number(g));
+
+    d = attenuation_input->text().toDouble();
+    if(d < 0)                   d = 0;
 
     if(show_animation)
     {
@@ -220,31 +269,82 @@ void MainWindow::NextFrame()
         {
             case 0:
             {
-                T += dt;
+                double t  = T/1000;
+                double dt = dT/1000;
 
-                int x_0 = main_scene_width/2;
-                int y_0 = main_scene_height/4;
+                T += dT;
 
                 L *= 100;
-                double g = G * 100;
-
-                double t = T/1000;
+                g *= 100;
 
                 // =================================    MATH
+                if(math_animation->isChecked())
+                {
+                    double f_1 = 0;
 
-                w_1 = sqrt(g/L);
-                qDebug() << w_1;
-                qDebug() << g;
-                qDebug() << L;
+                    /*
+                    if(math_animation_attenuation->isChecked())
+                    {
+                        d = attenuation_input->text().toDouble();
+                        if(d/m/2 > sqrt(g/L))
+                        {
+                            math_animation_label->setText("Attenuation too big");
+                            w_1 = 0;
+                            f_1 = 0;
+                        }
+                        else
+                        {
+                            math_animation_label->setText("");
+                            w_1 = sqrt(g/L - d*d/m*m/4);
+                            f_1 = f_0*exp((-1)*d*t)*cos(w_1*t);
+                        }
+                    }
+                    else
+                    {
+                        math_animation_label->setText("");
+                        w_1 = sqrt(g/L);
+                        f_1 = f_0*cos(w_1*t);
+                    }
+                    */
 
-                double f_1 = f_0*cos(w_1*t);
+                    if(d/m/2 > sqrt(g/L))
+                    {
+                        math_animation_label->setText("Attenuation too big");
+                        w_1 = 0;
+                        f_1 = 0;
+                    }
+                    else
+                    {
+                        math_animation_label->setText("");
+                        w_1 = sqrt(g/L - d*d/m*m/4);
+                        f_1 = f_0*exp((-1)*d*t)*cos(w_1*t);
+                    }
 
-                main_scene->addEllipse(x_0 + L*sin(f_1) - R, y_0 + L*cos(f_1) - R, 2*R, 2*R, QPen(), QBrush(Qt::red));
-                main_scene->addLine(x_0, y_0, x_0 + L*sin(f_1), y_0 + L*cos(f_1));
+                    main_scene->addEllipse(x_0_1 + L*sin(f_1) - R, y_0_1 + L*cos(f_1) - R, 2*R, 2*R, QPen(), QBrush(Qt::red));
+                    main_scene->addLine(x_0_1, y_0_1, x_0_1 + L*sin(f_1), y_0_1 + L*cos(f_1));
+                }
 
                 // =================================    REAL
 
-                //
+                if(real_animation->isChecked())
+                {
+                    if(!parameters_set)
+                    {
+                        x_1 = x_0_1 + L*sin(f_0);
+                        y_1 = y_0_1 + L*cos(f_0);
+                        parameters_set = true;
+                    }
+
+                    double v = v_x_1*L/(y_1 - y_0_1);
+                    v_x_1 -= ((g*(y_1 - y_0_1)/L + v*v/L)*(x_1 - x_0_1)/L + d*v*(y_1 - y_0_1)/L)*dt;    // (g*cos + v^2/L)*sin
+
+                    x_1 += v_x_1*dt;
+                    y_1  = y_0_1 + sqrt(L*L - (x_1 - x_0_1)*(x_1 - x_0_1));
+                    qDebug() << x_1 << y_1 << v_x_1 << v;
+
+                    main_scene->addEllipse(x_1 - R, y_1 - R, 2*R, 2*R, QPen(), QBrush(Qt::green));
+                    main_scene->addLine(x_0_1, y_0_1, x_1, y_1);
+                }
 
                 break;
             }
@@ -290,6 +390,12 @@ void MainWindow::ChangeCurrentAnimation(int new_animation_number)
     {
         //
     }
+}
+
+void MainWindow::Reset()
+{
+    T = 0;
+    parameters_set = false;
 }
 
 

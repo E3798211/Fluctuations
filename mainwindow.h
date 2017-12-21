@@ -13,6 +13,7 @@
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QRadioButton>
 #include <QDialog>
 #include <QGraphicsScene>
 #include <QGraphicsEllipseItem>
@@ -46,6 +47,7 @@ private:
     QGraphicsView   * plots_view_2;
 
     QPushButton     * main_button;
+    QPushButton     * reset_button;
 
     QLabel          * lenght_input_value;
     QLabel          * length_input_label;
@@ -53,6 +55,19 @@ private:
     QLabel          * mass_input_label;
     QLabel          * mass_input_value;
     QLineEdit       * mass_input;
+    QLabel          * g_input_label;
+    QLabel          * g_input_value;
+    QLineEdit       * g_input;
+    QLabel          * attenuation_input_label;
+    QLabel          * attenuation_input_value;
+    QLineEdit       * attenuation_input;
+
+    QCheckBox       * math_animation;
+    QCheckBox       * math_animation_attenuation;
+    QLabel          * math_animation_label;
+    QCheckBox       * real_animation;
+    QCheckBox       * real_animation_attenuation;
+    QLabel          * real_animation_label;
 
     QTimer          * timer;
 
@@ -68,9 +83,10 @@ private:
     int  current_animation      = 0;
     bool show_animation         = false;
     int  frame_frequency        = 30;
+    bool parameters_set         = false;
 
     // =========================================================    PHYSICS
-    double dt       = frame_frequency;
+    double dT       = frame_frequency;
     double T        = 0;
 
     double max_L    = 10;
@@ -84,12 +100,15 @@ private:
 
     double L        = min_L;
     double m        = min_m;
-    double G        = 9.8;
+    double g        = 9.8;
     double k        = min_k;
+    double d        = 0;
     double f_0      = max_f_0;
-    //double f_1      = min_f_0;
-    //double f_2      = min_f_0;
+    double x_0_1    = main_scene_width/2;
+    double y_0_1    = main_scene_height/4;
 
+    double x_1      = 0;
+    double y_1      = 0;
     double v_x_1    = 0;
     double v_x_2    = 0;
     double v_y_1    = 0;
@@ -177,6 +196,7 @@ private slots:
     void NextFrame();
     void ChangeAnimationStatus();
     void ChangeCurrentAnimation(int);
+    void Reset();
 };
 
 #endif // MAINWINDOW_H
