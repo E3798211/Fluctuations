@@ -58,6 +58,15 @@ private:
     QLabel          * g_input_label;
     QLabel          * g_input_value;
     QLineEdit       * g_input;
+    QLabel          * k_input_label;
+    QLabel          * k_input_value;
+    QLineEdit       * k_input;
+    QLabel          * f_1_input_label;
+    QLabel          * f_1_input_value;
+    QLineEdit       * f_1_input;
+    QLabel          * f_0_input_label;
+    QLabel          * f_0_input_value;
+    QLineEdit       * f_0_input;
     QLabel          * attenuation_input_label;
     QLabel          * attenuation_input_value;
     QLineEdit       * attenuation_input;
@@ -89,32 +98,46 @@ private:
     double dT       = frame_frequency;
     double T        = 0;
 
-    double max_L    = 10;
-    double min_L    = 1;
-    double max_m    = 10;
-    double min_m    = 1;
-    double max_k    = 10;
-    double min_k    = 1;
-    double min_f_0  = 0;
-    double max_f_0  = 0.5;
+    double min_L    = 0;
+    double max_L    = 2;
+    double min_m    = 0;
+    double max_m    = 100;
+    double min_g    = 1;
+    double max_g    = 100;
+    double min_d    = 0;
+    double max_d    = 50;
+    double min_k    = 0;
+    double max_k    = 50;
+    double min_f_0  = -0.5;
+    double max_f_0  =  0.5;
 
     double L        = min_L;
     double m        = min_m;
     double g        = 9.8;
     double k        = min_k;
     double d        = 0;
+    double f_1      = max_f_0;
     double f_0      = max_f_0;
     double x_0_1    = main_scene_width/2;
     double y_0_1    = main_scene_height/4;
+    double x_0_2    = main_scene_width/2;
+    double y_0_2    = main_scene_height/4;
 
     double x_1      = 0;
     double y_1      = 0;
+    double x_2      = 0;
+    double y_2      = 0;
     double v_x_1    = 0;
     double v_x_2    = 0;
     double v_y_1    = 0;
     double v_y_2    = 0;
     double w_1      = 0;
     double w_2      = 0;
+    double w_3      = 0;
+    double w_4      = 0;
+
+    double f_1_1    = 0;
+    double f_1_2    = 0;
 
     double R        = 10;
 
