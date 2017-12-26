@@ -52,6 +52,9 @@ private:
     QLabel          * lenght_input_value;
     QLabel          * length_input_label;
     QLineEdit       * length_input;
+    QLabel          * dlength_input_value;
+    QLabel          * dlength_input_label;
+    QLineEdit       * dlength_input;
     QLabel          * mass_input_label;
     QLabel          * mass_input_value;
     QLineEdit       * mass_input;
@@ -86,7 +89,7 @@ private:
     int main_scene_width        = 400;
     int plots_window_height     = 400;
     int plots_window_width      = 400;
-    int settings_window_height  = 200;
+    int settings_window_height  = 400;
     int settings_window_width   = 400;
 
     int  current_animation      = 0;
@@ -100,6 +103,8 @@ private:
 
     double min_L    = 0;
     double max_L    = 2;
+    double min_dL   = -0.5;
+    double max_dL   =  0.5;
     double min_m    = 0;
     double max_m    = 100;
     double min_g    = 1;
@@ -112,6 +117,7 @@ private:
     double max_f_0  =  0.5;
 
     double L        = min_L;
+    double dL       = 0;
     double m        = min_m;
     double g        = 9.8;
     double k        = min_k;
