@@ -33,24 +33,24 @@ MainWindow::MainWindow()
     mass_input_label    = new QLabel("Enter mass                (0.1 - 100.0) kg");
     mass_input          = new QLineEdit();
     mass_input_value    = new QLabel();
-    g_input_label       = new QLabel("Enter g                     (0.0 - 100.0) N/s");
+    g_input_label       = new QLabel("Enter g                (0.0 - 100.0) m/s^2");
     g_input             = new QLineEdit();
     g_input_value       = new QLabel();
-    k_input_label       = new QLabel("Enter k                       (0.0 - 50.0) N/s");
+    k_input_label       = new QLabel("Enter k                     (0.0 - 50.0) N/m");
     k_input             = new QLineEdit();
     k_input_value       = new QLabel();
 
-    dlength_input_label = new QLabel("Enter dl (part of Lenght) (-0.2 - 0.2) ");
+    dlength_input_label = new QLabel("Enter dl (part of Lenght) (-0.2 - 0.2)");
     dlength_input       = new QLineEdit();
     dlength_input_value = new QLabel();
 
-    attenuation_input_label     = new QLabel("Attenuation (0.0 - 50.0) N*m/s^2");
+    attenuation_input_label     = new QLabel("Attenuation           (0.0 - 50.0) kg/s");
     attenuation_input           = new QLineEdit();
     attenuation_input_value     = new QLabel();
-    f_1_input_label     = new QLabel("Enter f_1                     (-0.5 - 0.5) N/s");
+    f_1_input_label     = new QLabel("Enter f_1                     (-0.5 - 0.5) rad");
     f_1_input           = new QLineEdit();
     f_1_input_value     = new QLabel();
-    f_0_input_label     = new QLabel("Enter f_0                     (-0.5 - 0.5) N/s");
+    f_0_input_label     = new QLabel("Enter f_0                     (-0.5 - 0.5) rad");
     f_0_input           = new QLineEdit();
     f_0_input_value     = new QLabel();
 
@@ -188,9 +188,13 @@ MainWindow::MainWindow()
 
     // Show windows
 
-    main_window->show();
-    plots_window->show();
-    settings_window->show();
+    main_window->       move(100 + settings_window_width + 35, 100);
+    plots_window->      move(100, 100);
+    settings_window->   move(50  + settings_window_width + main_window_width, 200);
+
+    plots_window->      show();
+    main_window->       show();
+    settings_window->   show();
 }
 
 MainWindow::~MainWindow()

@@ -124,8 +124,8 @@ private:
 
     double min_L    = 0;
     double max_L    = 2;
-    double min_dL   = -0.5;
-    double max_dL   =  0.5;
+    double min_dL   = -0.2;
+    double max_dL   =  0.2;
     double min_m    = 0;
     double max_m    = 100;
     double min_g    = 1;
