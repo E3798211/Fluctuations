@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 
 #include <QGraphicsView>
+#include <QGraphicsTextItem>
 #include <QLabel>
 #include <QPushButton>
 #include <QLineEdit>
@@ -41,10 +42,16 @@ private:
     QGraphicsScene  * main_scene;
     QGraphicsScene  * plot_1_scene;
     QGraphicsScene  * plot_2_scene;
+    QGraphicsScene  * plot_3_scene;
 
     QGraphicsView   * main_view;
     QGraphicsView   * plots_view_1;
     QGraphicsView   * plots_view_2;
+    QGraphicsView   * plots_view_3;
+
+    QGraphicsTextItem   * plot_1_comment;
+    QGraphicsTextItem   * plot_2_comment;
+    QGraphicsTextItem   * plot_3_comment;
 
     QPushButton     * main_button;
     QPushButton     * reset_button;
@@ -96,6 +103,17 @@ private:
     bool show_animation         = false;
     int  frame_frequency        = 30;
     bool parameters_set         = false;
+    bool plots_clean            = true;
+
+    int A_1                     = 40;
+    int A_2                     = 90;
+    int B                       = plots_window_width - 10;
+
+    double v_max                = 250;
+    double x_max                = 200;
+
+    int plots_t                 = B;
+    int t_scale                 = 10;
 
     // =========================================================    PHYSICS
     double dT       = frame_frequency;
@@ -147,76 +165,8 @@ private:
 
     double R        = 10;
 
-    // FIRST
-/*
-    double L        = 200;
-    double m        = 1;
-    double g        = 9.8;
-    double f_0      = 0.5;
+    void DrawPlots(double x, double v, QColor color);
 
-    int x_0         = max_window_width /2;
-    int y_0         = max_window_height/4;
-
-    long double x        = x_0 + L*sin(f_0);
-    long double y        = 0;//y_0 + sqrt(L*L - (x - x_0)*(x - x_0));
-    long double v_x      = 0;
-    long double v_y      = 0;
-*/
-    // SECOND
-/*
-    double L        = 200;
-    double g        = 9.8;
-    double k_m      = 0.001;
-    //double f_0      = 0.4;
-
-    double f_0_1    = 0;
-    double f_0_2    = 0.3;
-
-    double x_0_1    = max_window_width /4;
-    double x_0_2    = max_window_width /4 * 3;
-
-    double y_0_1    = max_window_height/4;
-    double y_0_2    = max_window_height/4;
-
-    double w_1      = sqrt(g/L);
-    double w_2      = sqrt(g/L - 2*k_m);
-
-    double f_1_1    = f_0_1;
-    double f_1_2    = f_0_2;
-
-    double w_1_1    = 0;
-    double w_1_2    = 0;
-*/
-    // THIRD
-/*
-    double L_0      = 130;
-    double g        = 98;
-    double k        = 5;
-    double m        = 1;
-
-    double x_0      = main_window_width /2;  // 200
-    double y_0      = main_window_height/5;  // 80
-
-    double x        = 250;
-    double y        = 200;
-
-    double v_x      = 0;
-    double v_y      = 0;
-
-
-    double L_0_1    = L_0;
-    double g_1      = g;
-    double k_1      = k;
-    double m_1      = m;
-
-    double x_1      = x;
-    double y_1      = y;
-
-    double v_x_1    = 0;
-    double v_y_1    = 0;
-
-    double p        = 0.005;
-*/
 public:
     MainWindow();
     ~MainWindow();

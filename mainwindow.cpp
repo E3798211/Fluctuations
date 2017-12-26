@@ -17,10 +17,12 @@ MainWindow::MainWindow()
     main_view       = new QGraphicsView();
     plots_view_1    = new QGraphicsView();
     plots_view_2    = new QGraphicsView();
+    plots_view_3    = new QGraphicsView();
 
     main_scene      = new QGraphicsScene();
     plot_1_scene    = new QGraphicsScene();
     plot_2_scene    = new QGraphicsScene();
+    plot_3_scene    = new QGraphicsScene();
 
     main_button     = new QPushButton("&start");
     reset_button    = new QPushButton("&reset");
@@ -83,23 +85,32 @@ MainWindow::MainWindow()
     // =====================================================================    PLOTS WINDOW
     plots_view_1->setScene(plot_1_scene);
     plots_view_2->setScene(plot_2_scene);
+    plots_view_3->setScene(plot_3_scene);
 
-    plots_view_1->setFixedSize(plots_window_width, plots_window_height/2);
+    plots_view_1->setFixedSize(plots_window_width, plots_window_height/4);
     plots_view_1->setSceneRect(0, 0, plots_window_width, plots_window_height);
     plots_view_1->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     plots_view_1->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    plots_view_2->setFixedSize(plots_window_width, plots_window_height/2);
+    plots_view_2->setFixedSize(plots_window_width, plots_window_height/4);
     plots_view_2->setSceneRect(0, 0, plots_window_width, plots_window_height);
     plots_view_2->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     plots_view_2->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+    plots_view_3->setFixedSize(plots_window_width, plots_window_height/2);
+    plots_view_3->setSceneRect(0, 0, plots_window_width, plots_window_height);
+    plots_view_3->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    plots_view_3->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     plots_layout->addWidget(plots_view_1);
     plots_layout->addWidget(plots_view_2);
+    plots_layout->addWidget(plots_view_3);
 
     plots_window->setLayout(plots_layout);
-    //plots_window->resize(plots_window_width, plots_window_height);
-    plots_window->setFixedSize(plots_window_width, plots_window_height);
+    plots_window->setFixedSize(plots_window_width + 30, plots_window_height + 30);
+
+    // Plots comments
+
 
     // =====================================================================    SETTINGS WINDOW
     current_system->addItem("first");
@@ -178,7 +189,7 @@ MainWindow::MainWindow()
     // Show windows
 
     main_window->show();
-    //plots_window->show();
+    plots_window->show();
     settings_window->show();
 }
 
@@ -248,6 +259,8 @@ void MainWindow::NextFrame()
                 x_0_1    = main_scene_width/2;
                 y_0_1    = main_scene_height/4;
 
+                double v = 0;
+
                 // =================================    MATH
                 if(math_animation->isChecked())
                 {
@@ -256,20 +269,30 @@ void MainWindow::NextFrame()
                         double a_1 = ((-1)*d/2/m + sqrt((d/2/m)*(d/2/m) - g/L));
                         double a_2 = ((-1)*d/2/m - sqrt((d/2/m)*(d/2/m) - g/L));
 
-                        double x_1 = f_0*a_1/(a_1 - a_2);
-                        double x_2 = f_0*a_2/(a_1 - a_2)*(-1);
+                        double x_1 = f_0*a_2/(a_1 - a_2)*(-1);
+                        double x_2 = f_0*a_1/(a_1 - a_2);
 
-                        f_1 = x_1*exp(a_2*t) + x_2*exp(a_1*t);
+                        f_1 = x_1*exp(a_1*t) + x_2*exp(a_2*t);
+
+                        v = (x_1*a_1*exp(a_2*t) + x_2*a_2*exp(a_1*t))*L;
                     }
                     else
                     {
                         math_animation_label->setText("");
                         w_1 = sqrt(g/L - d*d/m*m/4);
-                        f_1 = f_0*exp((-1)*d/2/m*t)*cos(w_1*t);
+
+                        double gamma = atan(w_1*2*m/d);
+                        double A     = f_0/sin(gamma);
+
+                        f_1 = A*exp((-1)*d/2/m*t)*sin(w_1*t + gamma);
+
+                        v = (A*exp((-1)*d/2/m*t)*((-1)*d/2/m*sin(w_1*t + gamma) + w_1*cos(w_1*t + gamma)))*L;
                     }
 
                     main_scene->addEllipse(x_0_1 + L*sin(f_1) - R, y_0_1 + L*cos(f_1) - R, 2*R, 2*R, QPen(), QBrush(Qt::red));
                     main_scene->addLine(x_0_1, y_0_1, x_0_1 + L*sin(f_1), y_0_1 + L*cos(f_1));
+
+                    DrawPlots(f_1, v, Qt::red);
                 }
 
                 // =================================    REAL
@@ -287,11 +310,14 @@ void MainWindow::NextFrame()
                     double v = v_x_1*L/(y_1 - y_0_1);
                     v_x_1 -= ((g*(y_1 - y_0_1)/L + v*v/L)*(x_1 - x_0_1)/L + d*v*(y_1 - y_0_1)/L)*dt;    // (g*cos + v^2/L)*sin
 
+
                     x_1 += v_x_1*dt;
                     y_1  = y_0_1 + sqrt(L*L - (x_1 - x_0_1)*(x_1 - x_0_1));
 
                     main_scene->addEllipse(x_1 - R, y_1 - R, 2*R, 2*R, QPen(), QBrush(Qt::green));
                     main_scene->addLine(x_0_1, y_0_1, x_1, y_1);
+
+                    DrawPlots((x_1 - x_0_1)/L, v, Qt::green);
                 }
 
                 break;
@@ -311,7 +337,7 @@ void MainWindow::NextFrame()
                     double f_0_2 = 0;
                     double f_2   = 0;
                     double f_3   = 0;
-                    double b = 0;
+                    double v = 0;
                     if(d != 0)
                     {
                         math_animation_label->setText("Attenuation too big");
@@ -334,6 +360,8 @@ void MainWindow::NextFrame()
 
                         f_2 = A*cos(w_1*t)/2 + B*cos(w_2*t)/2;
                         f_3 = A*cos(w_1*t)/2 - B*cos(w_2*t)/2;
+
+                        v = ((-1)*A*w_1*sin(w_1*t)/2 + B*w_2*sin(w_2*t))*L/1.5;
                     }
 
                     main_scene->addEllipse(x_0_1 + L*sin(f_2) - 10, y_0_1 + L*cos(f_2) - 10, 20, 20, QPen(), QBrush(Qt::red));
@@ -341,6 +369,8 @@ void MainWindow::NextFrame()
                     main_scene->addEllipse(x_0_2 + L*sin(f_3) - 10, y_0_2 + L*cos(f_3) - 10, 20, 20, QPen(), QBrush(Qt::red));
                     main_scene->addLine(x_0_2, y_0_2, x_0_2 + L*sin(f_3), y_0_2 + L*cos(f_3));
                     main_scene->addLine(x_0_1 + L*sin(f_2), y_0_1 + L*cos(f_2), x_0_2 + L*sin(f_3), y_0_2 + L*cos(f_3));
+
+                    DrawPlots(f_3, v, Qt::red);
                 }
 
                 // =================================    REAL
@@ -356,19 +386,21 @@ void MainWindow::NextFrame()
                         parameters_set = true;
                     }
 
-                    f_1_1 += w_3*dt;
-                    f_1_2 += w_4*dt;
-
                     double c = atan((cos(f_1_1) - cos(f_1_2)) / (1 + sin(f_1_2) - sin(f_1_1)));
 
                     w_3 -= (g/L*sin(f_1_1) - k/m*(sin(f_1_2) - sin(f_1_1))*cos(f_1_1 - c) + w_3*d)*dt;
                     w_4 -= (g/L*sin(f_1_2) + k/m*(sin(f_1_2) - sin(f_1_1))*cos(f_1_2 - c) + w_4*d)*dt;
+
+                    f_1_1 += w_3*dt;
+                    f_1_2 += w_4*dt;
 
                     main_scene->addEllipse(x_0_1 + L*sin(f_1_1) - 10, y_0_1 + L*cos(f_1_1) - 10, 20, 20, QPen(), QBrush(Qt::green));
                     main_scene->addLine(x_0_1, y_0_1, x_0_1 + L*sin(f_1_1), y_0_1 + L*cos(f_1_1));
                     main_scene->addEllipse(x_0_2 + L*sin(f_1_2) - 10, y_0_2 + L*cos(f_1_2) - 10, 20, 20, QPen(), QBrush(Qt::green));
                     main_scene->addLine(x_0_2, y_0_2, x_0_2 + L*sin(f_1_2), y_0_2 + L*cos(f_1_2));
                     main_scene->addLine(x_0_1 + L*sin(f_1_1), y_0_1 + L*cos(f_1_1), x_0_2 + L*sin(f_1_2), y_0_2 + L*cos(f_1_2));
+
+                    DrawPlots(f_1_2, w_4*L, Qt::green);
                 }
 
                 break;
@@ -397,6 +429,10 @@ void MainWindow::NextFrame()
 
                 main_scene->addEllipse(x_1 - 10, y_1 - 10, 20, 20, QPen(), QBrush(Qt::green));
                 main_scene->addLine(x_0_1, y_0_1, x_1, y_1);
+
+                double f = atan((x_1 - x_0_1)/(y_1 - y_0_1));
+
+                DrawPlots(f, v_x_1*cos(f) + v_y_1*sin(f), Qt::green);
 
                 break;
             }
@@ -468,8 +504,70 @@ void MainWindow::ChangeCurrentAnimation(int new_animation_number)
 void MainWindow::Reset()
 {
     T = 0;
+
     main_scene->clear();
+    plot_1_scene->clear();
+    plot_2_scene->clear();
+    plot_3_scene->clear();
+
     parameters_set = false;
+    plots_clean    = true;
 }
 
+void MainWindow::DrawPlots(double x, double v, QColor color)
+{
+    if(plots_clean)     // Drawing axis
+    {
+        plot_1_scene->addLine(10, plots_window_height/8, B, plots_window_height/8);
+        plot_1_scene->addLine(10, plots_window_height/8 - A_1, 10, plots_window_height/8 + A_1);
+        plot_2_scene->addLine(10, plots_window_height/8, B, plots_window_height/8);
+        plot_2_scene->addLine(10, plots_window_height/8 - A_1, 10, plots_window_height/8 + A_1);
+        plot_3_scene->addLine(10, plots_window_height/4, B, plots_window_height/4);
+        plot_3_scene->addLine(plots_window_width/2, plots_window_height/4 - A_2, plots_window_width/2, plots_window_height/4 + A_2);
 
+        plot_1_comment  = new QGraphicsTextItem();
+        plot_1_comment->setPos(plots_window_width - 50, 5);
+        plot_1_comment->setPlainText("x (t)");
+        plot_1_scene->addItem(plot_1_comment);
+        plot_2_comment  = new QGraphicsTextItem();
+        plot_2_comment->setPos(plots_window_width - 50, 5);
+        plot_2_comment->setPlainText("v (t)");
+        plot_2_scene->addItem(plot_2_comment);
+        plot_3_comment  = new QGraphicsTextItem();
+        plot_3_comment->setPos(plots_window_width - 50, 5);
+        plot_3_comment->setPlainText("v (x)");
+        plot_3_scene->addItem(plot_3_comment);
+
+        plots_clean = false;
+    }
+
+
+    plots_t = (int)T/10 % B;
+
+    plot_1_scene->addEllipse(10 + plots_t, plots_window_height/8 - A_1*(x/max_f_0), 1, 1, QPen(color), QBrush(color));
+    plot_2_scene->addEllipse(10 + plots_t, plots_window_height/8 - A_1*(v/v_max), 1, 1, QPen(color), QBrush(color));
+    if(plots_t > B - 20)
+    {
+        plot_1_scene->clear();
+        plot_2_scene->clear();
+
+        plot_1_scene->addLine(10, plots_window_height/8, B, plots_window_height/8);
+        plot_1_scene->addLine(10, plots_window_height/8 - A_1, 10, plots_window_height/8 + A_1);
+        plot_2_scene->addLine(10, plots_window_height/8, B, plots_window_height/8);
+        plot_2_scene->addLine(10, plots_window_height/8 - A_1, 10, plots_window_height/8 + A_1);
+
+        plot_1_comment  = new QGraphicsTextItem();
+        plot_1_comment->setPos(plots_window_width - 50, 5);
+        plot_1_comment->setPlainText("x (t)");
+        plot_1_scene->addItem(plot_1_comment);
+        plot_2_comment  = new QGraphicsTextItem();
+        plot_2_comment->setPos(plots_window_width - 50, 5);
+        plot_2_comment->setPlainText("v (t)");
+        plot_2_scene->addItem(plot_2_comment);
+    }
+
+
+    plot_3_scene->addEllipse(plots_window_width/2 + 100*(x/max_f_0), plots_window_height/4 - 2*A_1*(v/v_max),
+                             1, 1, QPen(color), QBrush(color));
+
+}
