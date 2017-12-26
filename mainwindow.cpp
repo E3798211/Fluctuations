@@ -525,18 +525,49 @@ void MainWindow::DrawPlots(double x, double v, QColor color)
         plot_3_scene->addLine(10, plots_window_height/4, B, plots_window_height/4);
         plot_3_scene->addLine(plots_window_width/2, plots_window_height/4 - A_2, plots_window_width/2, plots_window_height/4 + A_2);
 
+        for(int i = 0; i < 4; i++)
+        {
+            plot_1_scene->addEllipse(10 + i*100, plots_window_height/8, 1, 1);
+            plot_2_scene->addEllipse(10 + i*100, plots_window_height/8, 1, 1);
+        }
+        for(int i = -2; i < 3; i++)
+        {
+            plot_1_scene->addEllipse(10, plots_window_height/8 + i*A_1*0.4, 1, 1);
+            plot_2_scene->addEllipse(10, plots_window_height/8 + i*A_1*0.4, 1, 1);
+        }
+        for(int i = -2; i < 3; i++)
+        {
+            plot_3_scene->addEllipse(plots_window_width/2 + 80*i, plots_window_height/4, 2, 2, QPen(), QBrush(Qt::black));   // df = 0.4 rad
+            plot_3_scene->addEllipse(plots_window_width/2, plots_window_height/4 + i*A_1*0.8, 2, 2, QPen(), QBrush(Qt::black));// dv = 1 m/s
+        }
+
+
         plot_1_comment  = new QGraphicsTextItem();
+        plot_1_comment->setPlainText("f (t)");
         plot_1_comment->setPos(plots_window_width - 50, 5);
-        plot_1_comment->setPlainText("x (t)");
+        plot_1_legend   = new QGraphicsTextItem();
+        plot_1_legend->setPos(plots_window_width - 150, plots_window_height/4 - 30);
+        plot_1_legend->setPlainText("df = 0.2 rad, dt = 1 s");
         plot_1_scene->addItem(plot_1_comment);
+        plot_1_scene->addItem(plot_1_legend);
+
         plot_2_comment  = new QGraphicsTextItem();
         plot_2_comment->setPos(plots_window_width - 50, 5);
         plot_2_comment->setPlainText("v (t)");
+        plot_2_legend   = new QGraphicsTextItem();
+        plot_2_legend->setPos(plots_window_width - 150, plots_window_height/4 - 30);
+        plot_2_legend->setPlainText("dv = 1 m/s,  dt = 1 s");
         plot_2_scene->addItem(plot_2_comment);
+        plot_2_scene->addItem(plot_2_legend);
+
         plot_3_comment  = new QGraphicsTextItem();
         plot_3_comment->setPos(plots_window_width - 50, 5);
-        plot_3_comment->setPlainText("v (x)");
+        plot_3_comment->setPlainText("v (f)");
+        plot_3_legend   = new QGraphicsTextItem();
+        plot_3_legend->setPos(plots_window_width - 150, plots_window_height/2 - 30);
+        plot_3_legend->setPlainText("df = 0.4 rad, dv = 1 m/s");
         plot_3_scene->addItem(plot_3_comment);
+        plot_3_scene->addItem(plot_3_legend);
 
         plots_clean = false;
     }
@@ -545,7 +576,7 @@ void MainWindow::DrawPlots(double x, double v, QColor color)
     plots_t = (int)T/10 % B;
 
     plot_1_scene->addEllipse(10 + plots_t, plots_window_height/8 - A_1*(x/max_f_0), 1, 1, QPen(color), QBrush(color));
-    plot_2_scene->addEllipse(10 + plots_t, plots_window_height/8 - A_1*(v/v_max), 1, 1, QPen(color), QBrush(color));
+    plot_2_scene->addEllipse(10 + plots_t, plots_window_height/8 - A_1*(v/v_max),   1, 1, QPen(color), QBrush(color));
     if(plots_t > B - 20)
     {
         plot_1_scene->clear();
@@ -556,14 +587,34 @@ void MainWindow::DrawPlots(double x, double v, QColor color)
         plot_2_scene->addLine(10, plots_window_height/8, B, plots_window_height/8);
         plot_2_scene->addLine(10, plots_window_height/8 - A_1, 10, plots_window_height/8 + A_1);
 
+        for(int i = 0; i < 4; i++)
+        {
+            plot_1_scene->addEllipse(10 + i*100, plots_window_height/8, 1, 1);      // dt = 1 s
+            plot_2_scene->addEllipse(10 + i*100, plots_window_height/8, 1, 1);
+        }
+        for(int i = -2; i < 3; i++)
+        {
+            plot_1_scene->addEllipse(10, plots_window_height/8 + i*A_1*0.4, 1, 1);  // df = 0.2 rad
+            plot_2_scene->addEllipse(10, plots_window_height/8 + i*A_1*0.4, 1, 1);  // dv = 1 m/s
+        }
+
         plot_1_comment  = new QGraphicsTextItem();
         plot_1_comment->setPos(plots_window_width - 50, 5);
-        plot_1_comment->setPlainText("x (t)");
+        plot_1_comment->setPlainText("f (t)");
+        plot_1_legend   = new QGraphicsTextItem();
+        plot_1_legend->setPos(plots_window_width - 150, plots_window_height/4 - 30);
+        plot_1_legend->setPlainText("df = 0.2 rad, dt = 1 s");
         plot_1_scene->addItem(plot_1_comment);
+        plot_1_scene->addItem(plot_1_legend);
+
         plot_2_comment  = new QGraphicsTextItem();
         plot_2_comment->setPos(plots_window_width - 50, 5);
         plot_2_comment->setPlainText("v (t)");
+        plot_2_legend   = new QGraphicsTextItem();
+        plot_2_legend->setPos(plots_window_width - 150, plots_window_height/4 - 30);
+        plot_2_legend->setPlainText("dv = 1 m/s,  dt = 1 s");
         plot_2_scene->addItem(plot_2_comment);
+        plot_2_scene->addItem(plot_2_legend);
     }
 
 

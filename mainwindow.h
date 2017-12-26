@@ -52,6 +52,9 @@ private:
     QGraphicsTextItem   * plot_1_comment;
     QGraphicsTextItem   * plot_2_comment;
     QGraphicsTextItem   * plot_3_comment;
+    QGraphicsTextItem   * plot_1_legend;
+    QGraphicsTextItem   * plot_2_legend;
+    QGraphicsTextItem   * plot_3_legend;
 
     QPushButton     * main_button;
     QPushButton     * reset_button;
